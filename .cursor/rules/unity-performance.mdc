@@ -1,0 +1,62 @@
+---
+description: Unity 性能优化规范，避免常见 GC 和 CPU 性能陷阱
+globs: **/*.cs
+alwaysApply: false
+---
+
+# Unity 性能优化规范
+
+## 禁止在 Update 中使用高开销 API
+
+```csharp
+// ❌ BAD：每帧查找组件，极其耗性能
+void Update() {
+    GetComponent<Rigidbody>().AddForce(Vector3.up);
+    GameObject.Find("Enemy").SetActive(false);
+}
+
+// ✅ GOOD：Awake/Start 缓存引用
+private Rigidbody _rb;
+void Awake() { _rb = GetComponent<Rigidbody>(); }
+void Update() { _rb.AddForce(Vector3.up); }
+```
+
+## 对象池（Object Pool）
+
+频繁生成/销毁的对象（子弹、特效、僵尸）必须使用对象池：
+
+```csharp
+// ✅ GOOD：使用 Unity 内置对象池
+using UnityEngine.Pool;
+
+private ObjectPool<GameObject> _bulletPool;
+
+void Awake() {
+    _bulletPool = new ObjectPool<GameObject>(
+        createFunc: () => Instantiate(bulletPrefab),
+        actionOnGet: obj => obj.SetActive(true),
+        actionOnRelease: obj => obj.SetActive(false)
+    );
+}
+```
+
+## 避免字符串 GC
+
+```csharp
+// ❌ BAD
+void Update() {
+    Debug.Log("Score: " + score);
+}
+
+// ✅ GOOD：使用 string interpolation 或 StringBuilder（热路径）
+// 非热路径可用 $"Score: {score}"
+// 热路径用 StringBuilder.Clear() + Append()
+```
+
+## 协程与异步
+
+- 用 `WaitForSeconds` 缓存，避免每次 new 产生 GC：
+  ```csharp
+  private WaitForSeconds _wait = new WaitForSeconds(1f);
+  ```
+- 不要在每帧 Update 里开启新协程

@@ -1,0 +1,49 @@
+---
+description: Unity C# 编码规范，适用于所有 C# 脚本文件
+globs: **/*.cs
+alwaysApply: false
+---
+
+# Unity C# 编码规范
+
+## 命名规范
+
+- 类、方法、属性、公共字段：`PascalCase`
+- 私有字段：`_camelCase`（下划线前缀）
+- 局部变量、参数：`camelCase`
+- 常量：`ALL_CAPS_SNAKE_CASE`
+- 接口：`IMyInterface`（I 前缀）
+
+```csharp
+// ❌ BAD
+public class player_controller : MonoBehaviour {
+    public float moveSpeed;
+    private int hp;
+}
+
+// ✅ GOOD
+public class PlayerController : MonoBehaviour {
+    public float MoveSpeed;
+    [SerializeField] private int _hp;
+}
+```
+
+## 字段序列化
+
+- 优先使用 `[SerializeField] private` 暴露字段到 Inspector，而非 `public`
+- 公共 API 使用属性（Property）封装
+
+```csharp
+// ❌ BAD
+public float speed;
+
+// ✅ GOOD
+[SerializeField] private float _speed = 5f;
+public float Speed => _speed;
+```
+
+## 文件结构
+
+- 每个 `.cs` 文件只包含**一个** MonoBehaviour / 类
+- 文件名必须与类名完全一致
+- 使用命名空间：`namespace SongShuVegetable.{Module}`

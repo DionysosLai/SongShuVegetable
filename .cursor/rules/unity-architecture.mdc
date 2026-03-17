@@ -1,0 +1,56 @@
+---
+description: Unity 架构规范，组件化设计、ScriptableObject 数据驱动、事件通信模式
+globs: **/*.cs
+alwaysApply: false
+---
+
+# Unity 架构规范
+
+## 单一职责原则
+
+每个 MonoBehaviour 只做一件事，功能按职责拆分：
+
+```
+PlayerController   → 仅处理输入与移动
+PlayerHealth       → 仅管理生命值
+PlayerAnimator     → 仅驱动动画状态机
+```
+
+## ScriptableObject 数据驱动
+
+游戏配置数据（植物属性、僵尸属性、关卡数据等）使用 ScriptableObject：
+
+```csharp
+// ✅ GOOD：植物配置数据
+[CreateAssetMenu(fileName = "PlantData", menuName = "SongShu/PlantData")]
+public class PlantData : ScriptableObject {
+    public string PlantName;
+    public int SunCost;
+    public int MaxHealth;
+    public float AttackInterval;
+}
+```
+
+## 事件通信
+
+组件间通信优先使用事件，避免硬引用：
+
+```csharp
+// ✅ GOOD：使用 C# Action 解耦
+public class ZombieHealth : MonoBehaviour {
+    public static event Action<GameObject> OnZombieDied;
+
+    public void Die() {
+        OnZombieDied?.Invoke(gameObject);
+        Destroy(gameObject);
+    }
+}
+```
+
+## Singleton 模式
+
+全局管理器（GameManager、AudioManager）使用泛型 Singleton 基类，不要随意滥用：
+
+```csharp
+public class GameManager : SingletonMonoBehaviour<GameManager> { }
+```

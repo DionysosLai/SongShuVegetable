@@ -1,0 +1,47 @@
+---
+description: Unity 项目 Assets 目录结构规范
+alwaysApply: true
+---
+
+# Unity Assets 目录结构规范
+
+## 标准分层结构
+
+```
+Assets/
+├── Art/                    # 美术资源
+│   ├── Animations/         # 动画 Clip
+│   ├── Materials/          # 材质
+│   ├── Models/             # 3D 模型
+│   ├── Sprites/            # 2D 精灵图
+│   └── UI/                 # UI 图集
+├── Audio/                  # 音频
+│   ├── BGM/                # 背景音乐
+│   └── SFX/                # 音效
+├── Prefabs/                # 预制体
+│   ├── Plants/             # 植物预制体
+│   ├── Zombies/            # 僵尸预制体
+│   ├── Projectiles/        # 子弹/投射物
+│   └── UI/                 # UI 预制体
+├── Scenes/                 # 场景文件
+│   ├── Main.unity
+│   ├── GamePlay.unity
+│   └── UI/
+├── ScriptableObjects/      # SO 数据资产
+│   ├── Plants/
+│   └── Zombies/
+├── Scripts/                # C# 脚本
+│   ├── Core/               # 核心系统（GameManager、ObjectPool）
+│   ├── Plants/             # 植物逻辑
+│   ├── Zombies/            # 僵尸逻辑
+│   ├── UI/                 # UI 脚本
+│   ├── Data/               # ScriptableObject 定义
+│   └── Utils/              # 工具类
+└── Settings/               # 项目设置（InputActions、RenderPipeline）
+```
+
+## 规则
+
+- 不允许在 Assets 根目录直接放脚本或资源
+- 第三方插件放入 `Assets/Plugins/` 或 `Assets/ThirdParty/`
+- 每个功能模块的脚本、预制体、SO 使用同名子目录对应
